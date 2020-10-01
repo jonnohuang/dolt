@@ -53,7 +53,7 @@ func TestChunkStoreVersion(t *testing.T) {
 
 	assert.Equal(constants.NomsVersion, store.Version())
 	newRoot := hash.Of([]byte("new root"))
-	if assert.True(store.Commit(context.Background(), newRoot, hash.Hash{})) {
+	if assert.True(store.Commit(context.Background(), newRoot, hash.Hash{}, )) {
 		assert.Equal(constants.NomsVersion, store.Version())
 	}
 }
@@ -102,7 +102,7 @@ func TestChunkStoreCommit(t *testing.T) {
 	newRoot := newRootChunk.Hash()
 	err = store.Put(context.Background(), newRootChunk)
 	assert.NoError(err)
-	success, err := store.Commit(context.Background(), newRoot, hash.Hash{})
+	success, err := store.Commit(context.Background(), newRoot, hash.Hash{}, )
 	assert.NoError(err)
 	if assert.True(success) {
 		has, err := store.Has(context.Background(), newRoot)
@@ -117,7 +117,7 @@ func TestChunkStoreCommit(t *testing.T) {
 	secondRoot := secondRootChunk.Hash()
 	err = store.Put(context.Background(), secondRootChunk)
 	assert.NoError(err)
-	success, err = store.Commit(context.Background(), secondRoot, newRoot)
+	success, err = store.Commit(context.Background(), secondRoot, newRoot, )
 	assert.NoError(err)
 	if assert.True(success) {
 		h, err := store.Root(context.Background())
@@ -183,11 +183,11 @@ func TestChunkStoreCommitOptimisticLockFail(t *testing.T) {
 	assert.NoError(err)
 
 	newRoot2 := hash.Of([]byte("new root 2"))
-	success, err := store.Commit(context.Background(), newRoot2, hash.Hash{})
+	success, err := store.Commit(context.Background(), newRoot2, hash.Hash{}, )
 	assert.NoError(err)
 	assert.False(success)
 	assertDataInStore(chunks, store, assert)
-	success, err = store.Commit(context.Background(), newRoot2, newRoot)
+	success, err = store.Commit(context.Background(), newRoot2, newRoot, )
 	assert.NoError(err)
 	assert.True(success)
 }
@@ -211,19 +211,19 @@ func TestChunkStoreManifestPreemptiveOptimisticLockFail(t *testing.T) {
 	chunk := chunks.NewChunk([]byte("hello"))
 	err = interloper.Put(context.Background(), chunk)
 	assert.NoError(err)
-	assert.True(interloper.Commit(context.Background(), chunk.Hash(), hash.Hash{}))
+	assert.True(interloper.Commit(context.Background(), chunk.Hash(), hash.Hash{}, ))
 
 	// Try to land a new chunk in store, which should fail AND not persist the contents of store.mt
 	chunk = chunks.NewChunk([]byte("goodbye"))
 	err = store.Put(context.Background(), chunk)
 	assert.NoError(err)
 	assert.NotNil(store.mt)
-	assert.False(store.Commit(context.Background(), chunk.Hash(), hash.Hash{}))
+	assert.False(store.Commit(context.Background(), chunk.Hash(), hash.Hash{}, ))
 	assert.NotNil(store.mt)
 
 	h, err := store.Root(context.Background())
 	assert.NoError(err)
-	success, err := store.Commit(context.Background(), chunk.Hash(), h)
+	success, err := store.Commit(context.Background(), chunk.Hash(), h, )
 	assert.NoError(err)
 	assert.True(success)
 	assert.Nil(store.mt)
@@ -264,7 +264,7 @@ func TestChunkStoreCommitLocksOutFetch(t *testing.T) {
 	assert.NoError(err)
 	h, err := store.Root(context.Background())
 	assert.NoError(err)
-	success, err := store.Commit(context.Background(), rootChunk.Hash(), h)
+	success, err := store.Commit(context.Background(), rootChunk.Hash(), h, )
 	assert.NoError(err)
 	assert.True(success)
 
@@ -312,7 +312,7 @@ func TestChunkStoreSerializeCommits(t *testing.T) {
 			assert.NoError(err)
 			h, err := interloper.Root(context.Background())
 			assert.NoError(err)
-			success, err := interloper.Commit(context.Background(), h, h)
+			success, err := interloper.Commit(context.Background(), h, h, )
 			assert.NoError(err)
 			assert.True(success)
 		}()
@@ -324,7 +324,7 @@ func TestChunkStoreSerializeCommits(t *testing.T) {
 	assert.NoError(err)
 	h, err := store.Root(context.Background())
 	assert.NoError(err)
-	success, err := store.Commit(context.Background(), h, h)
+	success, err := store.Commit(context.Background(), h, h, )
 	assert.NoError(err)
 	assert.True(success)
 
@@ -532,5 +532,5 @@ func (ftp fakeTablePersister) Open(ctx context.Context, name addr, chunkCount ui
 }
 
 func (ftp fakeTablePersister) PruneTableFiles(_ context.Context, _ manifestContents) error {
-	return ErrUnsupportedOperation
+	return chunks.ErrUnsupportedOperation
 }

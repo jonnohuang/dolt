@@ -86,7 +86,7 @@ func TestStats(t *testing.T) {
 
 	h, err := store.Root(context.Background())
 	assert.NoError(err)
-	_, err = store.Commit(context.Background(), h, h)
+	_, err = store.Commit(context.Background(), h, h, )
 	assert.NoError(err)
 
 	// Commit will update the manifest
@@ -129,14 +129,14 @@ func TestStats(t *testing.T) {
 	assert.NoError(err)
 	h, err = store.Root(context.Background())
 	assert.NoError(err)
-	_, err = store.Commit(context.Background(), h, h)
+	_, err = store.Commit(context.Background(), h, h, )
 	assert.NoError(err)
 
 	err = store.Put(context.Background(), c5)
 	assert.NoError(err)
 	h, err = store.Root(context.Background())
 	assert.NoError(err)
-	_, err = store.Commit(context.Background(), h, h)
+	_, err = store.Commit(context.Background(), h, h, )
 	assert.NoError(err)
 
 	assert.Equal(uint64(1), stats(store).ConjoinLatency.Samples())

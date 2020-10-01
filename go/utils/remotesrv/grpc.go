@@ -261,7 +261,7 @@ func (rs *RemoteChunkStore) Commit(ctx context.Context, req *remotesapi.CommitRe
 	lastHash := hash.New(req.Last)
 
 	var ok bool
-	ok, err = cs.Commit(ctx, currHash, lastHash)
+	ok, err = cs.Commit(ctx, currHash, lastHash, )
 
 	if err != nil {
 		logger(fmt.Sprintf("error occurred during processing of Commit of %s/%s last %s curr: %s details: %v", req.RepoId.Org, req.RepoId.RepoName, lastHash.String(), currHash.String(), err))

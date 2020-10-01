@@ -136,7 +136,7 @@ func TestNBSPruneTableFiles(t *testing.T) {
 	c := []byte("it's a boy!")
 	ok := st.addChunk(ctx, computeAddr(c), c)
 	require.True(t, ok)
-	ok, err := st.Commit(ctx, st.upstream.root, st.upstream.root)
+	ok, err := st.Commit(ctx, st.upstream.root, st.upstream.root, )
 	require.True(t, ok)
 	require.NoError(t, err)
 

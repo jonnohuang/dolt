@@ -102,7 +102,7 @@ func (suite *BlockStoreSuite) TestChunkStorePut() {
 
 	rt, err := suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err := suite.store.Commit(context.Background(), h, rt) // Commit writes
+	success, err := suite.store.Commit(context.Background(), h, rt, ) // Commit writes
 	suite.NoError(err)
 	suite.True(success)
 
@@ -120,7 +120,7 @@ func (suite *BlockStoreSuite) TestChunkStorePut() {
 	assertInputInStore(input, h, suite.store, suite.Assert())
 	rt, err = suite.store.Root(context.Background())
 	suite.NoError(err)
-	_, err = suite.store.Commit(context.Background(), h, rt) // Commit writes
+	_, err = suite.store.Commit(context.Background(), h, rt, ) // Commit writes
 	suite.NoError(err)
 
 	if suite.putCountFn != nil {
@@ -138,7 +138,7 @@ func (suite *BlockStoreSuite) TestChunkStorePutMany() {
 
 	rt, err := suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err := suite.store.Commit(context.Background(), c1.Hash(), rt) // Commit writes
+	success, err := suite.store.Commit(context.Background(), c1.Hash(), rt, ) // Commit writes
 	suite.NoError(err)
 	suite.True(success)
 
@@ -160,7 +160,7 @@ func (suite *BlockStoreSuite) TestChunkStoreStatsSummary() {
 
 	rt, err := suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err := suite.store.Commit(context.Background(), c1.Hash(), rt) // Commit writes
+	success, err := suite.store.Commit(context.Background(), c1.Hash(), rt, ) // Commit writes
 	suite.True(success)
 	suite.NoError(err)
 
@@ -183,7 +183,7 @@ func (suite *BlockStoreSuite) TestChunkStorePutMoreThanMemTable() {
 
 	rt, err := suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err := suite.store.Commit(context.Background(), c1.Hash(), rt) // Commit writes
+	success, err := suite.store.Commit(context.Background(), c1.Hash(), rt, ) // Commit writes
 	suite.NoError(err)
 	suite.True(success)
 
@@ -213,7 +213,7 @@ func (suite *BlockStoreSuite) TestChunkStoreGetMany() {
 
 	rt, err := suite.store.Root(context.Background())
 	suite.NoError(err)
-	_, err = suite.store.Commit(context.Background(), chnx[0].Hash(), rt) // Commit writes
+	_, err = suite.store.Commit(context.Background(), chnx[0].Hash(), rt, ) // Commit writes
 	suite.NoError(err)
 
 	hashes := make(hash.HashSlice, len(chnx))
@@ -248,7 +248,7 @@ func (suite *BlockStoreSuite) TestChunkStoreHasMany() {
 
 	rt, err := suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err := suite.store.Commit(context.Background(), chnx[0].Hash(), rt) // Commit writes
+	success, err := suite.store.Commit(context.Background(), chnx[0].Hash(), rt, ) // Commit writes
 	suite.NoError(err)
 	suite.True(success)
 	notPresent := chunks.NewChunk([]byte("ghi")).Hash()
@@ -276,7 +276,7 @@ func (suite *BlockStoreSuite) TestChunkStoreFlushOptimisticLockFail() {
 	suite.NoError(err)
 	h, err := interloper.Root(context.Background())
 	suite.NoError(err)
-	success, err := interloper.Commit(context.Background(), h, h)
+	success, err := interloper.Commit(context.Background(), h, h, )
 	suite.NoError(err)
 	suite.True(success)
 
@@ -284,7 +284,7 @@ func (suite *BlockStoreSuite) TestChunkStoreFlushOptimisticLockFail() {
 	suite.NoError(err)
 	h, err = suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err = suite.store.Commit(context.Background(), h, h)
+	success, err = suite.store.Commit(context.Background(), h, h, )
 	suite.NoError(err)
 	suite.True(success)
 
@@ -295,19 +295,19 @@ func (suite *BlockStoreSuite) TestChunkStoreFlushOptimisticLockFail() {
 
 	h, err = interloper.Root(context.Background())
 	suite.NoError(err)
-	success, err = interloper.Commit(context.Background(), c1.Hash(), h) // Commit root
+	success, err = interloper.Commit(context.Background(), c1.Hash(), h, ) // Commit root
 	suite.NoError(err)
 	suite.True(success)
 
 	// Updating from stale root should fail...
-	success, err = suite.store.Commit(context.Background(), c2.Hash(), root)
+	success, err = suite.store.Commit(context.Background(), c2.Hash(), root, )
 	suite.NoError(err)
 	suite.False(success)
 
 	// ...but new root should succeed
 	h, err = suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err = suite.store.Commit(context.Background(), c2.Hash(), h)
+	success, err = suite.store.Commit(context.Background(), c2.Hash(), h, )
 	suite.NoError(err)
 	suite.True(success)
 }
@@ -322,7 +322,7 @@ func (suite *BlockStoreSuite) TestChunkStoreRebaseOnNoOpFlush() {
 	suite.NoError(err)
 	root, err := interloper.Root(context.Background())
 	suite.NoError(err)
-	success, err := interloper.Commit(context.Background(), c1.Hash(), root)
+	success, err := interloper.Commit(context.Background(), c1.Hash(), root, )
 	suite.NoError(err)
 	suite.True(success)
 
@@ -337,7 +337,7 @@ func (suite *BlockStoreSuite) TestChunkStoreRebaseOnNoOpFlush() {
 	// Should Rebase, even though there's no work to do.
 	root, err = suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err = suite.store.Commit(context.Background(), root, root)
+	success, err = suite.store.Commit(context.Background(), root, root, )
 	suite.NoError(err)
 	suite.True(success)
 
@@ -358,7 +358,7 @@ func (suite *BlockStoreSuite) TestChunkStorePutWithRebase() {
 	suite.NoError(err)
 	h, err := interloper.Root(context.Background())
 	suite.NoError(err)
-	success, err := interloper.Commit(context.Background(), h, h)
+	success, err := interloper.Commit(context.Background(), h, h, )
 	suite.NoError(err)
 	suite.True(success)
 
@@ -381,7 +381,7 @@ func (suite *BlockStoreSuite) TestChunkStorePutWithRebase() {
 	// Commit interloper root
 	h, err = interloper.Root(context.Background())
 	suite.NoError(err)
-	success, err = interloper.Commit(context.Background(), c1.Hash(), h)
+	success, err = interloper.Commit(context.Background(), c1.Hash(), h, )
 	suite.NoError(err)
 	suite.True(success)
 
@@ -395,7 +395,7 @@ func (suite *BlockStoreSuite) TestChunkStorePutWithRebase() {
 	// Rebase grabbed the new root, so updating should now succeed!
 	h, err = suite.store.Root(context.Background())
 	suite.NoError(err)
-	success, err = suite.store.Commit(context.Background(), c2.Hash(), h)
+	success, err = suite.store.Commit(context.Background(), c2.Hash(), h, )
 	suite.NoError(err)
 	suite.True(success)
 
@@ -444,7 +444,7 @@ func TestBlockStoreConjoinOnCommit(t *testing.T) {
 		assert.NoError(t, err)
 		err = smallTableStore.Put(context.Background(), newChunk)
 		assert.NoError(t, err)
-		success, err := smallTableStore.Commit(context.Background(), newChunk.Hash(), root)
+		success, err := smallTableStore.Commit(context.Background(), newChunk.Hash(), root, )
 		assert.NoError(t, err)
 		assert.True(t, success)
 
@@ -485,7 +485,7 @@ func TestBlockStoreConjoinOnCommit(t *testing.T) {
 		assert.NoError(t, err)
 		err = smallTableStore.Put(context.Background(), newChunk)
 		assert.NoError(t, err)
-		success, err := smallTableStore.Commit(context.Background(), newChunk.Hash(), root)
+		success, err := smallTableStore.Commit(context.Background(), newChunk.Hash(), root, )
 		assert.NoError(t, err)
 		assert.True(t, success)
 		ok, err := smallTableStore.Has(context.Background(), newChunk.Hash())
@@ -520,7 +520,7 @@ func TestBlockStoreConjoinOnCommit(t *testing.T) {
 		assert.NoError(t, err)
 		err = smallTableStore.Put(context.Background(), newChunk)
 		assert.NoError(t, err)
-		success, err := smallTableStore.Commit(context.Background(), newChunk.Hash(), root)
+		success, err := smallTableStore.Commit(context.Background(), newChunk.Hash(), root, )
 		assert.NoError(t, err)
 		assert.True(t, success)
 		ok, err := smallTableStore.Has(context.Background(), newChunk.Hash())
