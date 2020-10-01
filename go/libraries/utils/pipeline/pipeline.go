@@ -8,9 +8,24 @@ import (
 	"sync/atomic"
 )
 
+const LocalStorageKey = "ls"
+
+type LocalStorage map[int]interface{}
+
+func (ls LocalStorage) Get(id int) (interface{}, bool) {
+	val, ok := ls[id]
+	return val, ok
+}
+
+func (ls LocalStorage) Put(id int, val interface{}) {
+	ls[id] = val
+}
+
 // ErrInvalidItemWrittenAtFinalStageInPipeline is indicative of a bug.  Only error items should be written to the output
 // channel of the final stage in a pipeline
 var ErrInvalidItemWrittenAtFinalStageInPipeline = errors.New("invalid item written at last stage in pipeline")
+
+type StageInitFunc func(ctx context.Context, stageRoutineIndex int)
 
 // StageFunc takes a batch of items, and returns a new batch of items that have been transformed.  The first StageFunc
 // in a pipeline will receive nil input batches, and should produce batches to be processed by the pipeline.  Other stages
@@ -22,6 +37,7 @@ type StageFunc func(ctx context.Context, inBatch []ItemWithProps) ([]ItemWithPro
 // stage of a pipeline should only write ErrorItems
 type Stage struct {
 	name         string
+	initFunc     StageInitFunc
 	stageFunc    StageFunc
 	parallelism  int
 	inBufferSize int
@@ -33,9 +49,10 @@ type Stage struct {
 }
 
 // NewStage creates a new pipeline
-func NewStage(name string, stageFunc StageFunc, parallelism, inBufferSize, inBatchSize int) *Stage {
+func NewStage(name string, initFunc StageInitFunc, stageFunc StageFunc, parallelism, inBufferSize, inBatchSize int) *Stage {
 	return &Stage{
 		name:         name,
+		initFunc:     initFunc,
 		stageFunc:    stageFunc,
 		parallelism:  parallelism,
 		inBufferSize: inBufferSize,
@@ -81,6 +98,12 @@ func (s *Stage) start(ctx context.Context, wg *sync.WaitGroup) {
 					close(s.outCh)
 				}
 			}()
+
+			ctx = context.WithValue(ctx, LocalStorageKey, &LocalStorage{})
+
+			if s.initFunc != nil {
+				s.initFunc(ctx, i)
+			}
 
 			if s.inCh == nil {
 				s.runFirstStageInPipeline(ctx)
