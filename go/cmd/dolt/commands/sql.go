@@ -59,8 +59,8 @@ import (
 	"github.com/dolthub/dolt/go/libraries/utils/argparser"
 	"github.com/dolthub/dolt/go/libraries/utils/filesys"
 	"github.com/dolthub/dolt/go/libraries/utils/iohelp"
-	pipeline2 "github.com/dolthub/dolt/go/libraries/utils/pipeline"
 	"github.com/dolthub/dolt/go/libraries/utils/osutil"
+	pipeline2 "github.com/dolthub/dolt/go/libraries/utils/pipeline"
 	"github.com/dolthub/dolt/go/store/types"
 )
 
@@ -1469,7 +1469,7 @@ func (se *sqlEngine) ddl(ctx *sql.Context, ddl *sqlparser.DDL, query string) (sq
 }
 
 const (
-	readBatchSize = 10
+	readBatchSize  = 10
 	writeBatchSize = 1
 )
 

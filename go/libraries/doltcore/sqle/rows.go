@@ -19,6 +19,7 @@ import (
 	"io"
 
 	"github.com/dolthub/go-mysql-server/sql"
+	"github.com/shopspring/decimal"
 
 	"github.com/dolthub/dolt/go/libraries/doltcore/row"
 	"github.com/dolthub/dolt/go/libraries/doltcore/schema"
